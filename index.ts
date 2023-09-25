@@ -1,16 +1,7 @@
 import fs from "fs";
 import http, { IncomingMessage, ServerResponse } from "http";
 import axios from "axios";
-
-interface RequestBody {
-  username: string;
-}
-
-interface ResponseMessage {
-  message: string;
-  success: boolean;
-  data: any;
-}
+import { RequestBody, ResponseMessage } from "./interface";
 
 const port: number = 2023;
 
