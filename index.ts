@@ -1,7 +1,8 @@
-import fs from "fs";
+import fs, { createWriteStream } from "fs";
 import http, { IncomingMessage, ServerResponse } from "http";
 import axios from "axios";
 import { RequestBody, ResponseMessage } from "./interface";
+import path from "path";
 
 const port: number = 2023;
 
@@ -34,6 +35,23 @@ const handleGetOneGithubUrl = async (
     const status = endPoint.status;
     const userDetails = endPoint.data;
 
+    const userPhoto = userDetails.avatar_url;
+    const avatarName = `${userDetails.login}_avatar.jpg`;
+    const avatarFolder = path.join(__dirname, "Github");
+    const avatarPath = path.join(avatarFolder, avatarName);
+
+    const getAvatar = await axios.get(userPhoto, {
+      responseType: "stream",
+    });
+
+    try {
+      fs.mkdirSync(avatarFolder, { recursive: true });
+      getAvatar.data.pipe(createWriteStream(avatarPath));
+    } catch (error) {
+      console.log("Err", error);
+
+      throw new Error(`Error creating directory or writing file: ${error}`);
+    }
     const response: ResponseMessage = {
       message: `${userDetails?.login} Found`,
       success: true,
