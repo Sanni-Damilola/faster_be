@@ -1,106 +1,38 @@
-import fs, { createWriteStream } from "fs";
-import http, { IncomingMessage, ServerResponse } from "http";
-import axios from "axios";
-import { RequestBody, ResponseMessage } from "./interface";
-import path from "path";
+import express, { Application } from "express";
+import { MainAppConfig } from "./app";
+import { EnvironmentVariables } from "./config/envV";
+import { DBCONNECTION } from "./config/database";
 
-const port: number = 2023;
+// The port of our backend server
+// const port: number = 2023;
+const port: number = Number(EnvironmentVariables.PORT);
 
-const handleNotFound = (res: ServerResponse<IncomingMessage>) => {
-  const status: number = 404;
-  const response: ResponseMessage = {
-    message: "Not Found",
-    success: false,
-    data: null,
-  };
-  res.writeHead(status, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ status, response }));
-};
+// Extantiating our server from express
+const app: Application = express();
 
-const handleGetOneGithubUrl = async (
-  req: IncomingMessage,
-  res: ServerResponse<IncomingMessage>,
-  reqData: RequestBody
-) => {
-  try {
-    const { username } = reqData;
-    if (!username) {
-      throw new Error("Username not provided");
-    }
+// Connecting main app configuration
+MainAppConfig(app);
+DBCONNECTION();
+// Connecting DB to server:
 
-    const endPoint = await axios.get(
-      `https://api.github.com/users/${username}`
-    );
+// Server is connected and listening to port
+const server = app.listen(port, () => {
+  console.log("");
 
-    const status = endPoint.status;
-    const userDetails = endPoint.data;
+  console.log(
+    "Server is up and running 🚀🚀 \n Listening to port on port ",
+    port
+  );
+});
 
-    const userPhoto = userDetails.avatar_url;
-    const avatarName = `${userDetails.login}_avatar.jpg`;
-    const avatarFolder = path.join(__dirname, "Github");
-    const avatarPath = path.join(avatarFolder, avatarName);
-
-    const getAvatar = await axios.get(userPhoto, {
-      responseType: "stream",
-    });
-
-    try {
-      fs.mkdirSync(avatarFolder, { recursive: true });
-      getAvatar.data.pipe(createWriteStream(avatarPath));
-    } catch (error) {
-      console.log("Err", error);
-
-      throw new Error(`Error creating directory or writing file: ${error}`);
-    }
-    const response: ResponseMessage = {
-      message: `${userDetails?.login} Found`,
-      success: true,
-      data: userDetails,
-    };
-
-    res.writeHead(status, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status, response }));
-  } catch (error: any) {
-    const status: number = 404;
-    const response: ResponseMessage = {
-      message: error.message || "Not Found",
-      success: false,
-      data: null,
-    };
-
-    res.writeHead(status, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status, response }));
-  }
-};
-
-const server = http.createServer(
-  async (req: IncomingMessage, res: ServerResponse<IncomingMessage>) => {
-    try {
-      const { method, url } = req;
-
-      if (method === "POST") {
-        if (url === "/getonegithuburl") {
-          let reqbody = "";
-          req.on("data", (chunk) => {
-            reqbody += chunk;
-          });
-          req.on("end", async () => {
-            const reqData: RequestBody = JSON.parse(reqbody);
-            await handleGetOneGithubUrl(req, res, reqData);
-          });
-        } else {
-          handleNotFound(res);
-        }
-      } else {
-        handleNotFound(res);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      handleNotFound(res);
-    }
-  }
-);
-
-server.listen(port, () => {
-  console.log("Done On Port", port);
+// Preventing the server from crashing
+process.on("uncaughtException", (error: Error) => {
+  console.log("Server is Shutting down due to uncaughtException", error);
+  process.exit(1);
+});
+process.once("unhandledRejection", (reason: Error) => {
+  console.log("Server is Shutting down due to unhandledRejection", reason);
+  server.close(() => {
+    process.exit(1);
+  });
 });
