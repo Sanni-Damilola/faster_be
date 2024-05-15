@@ -16,9 +16,10 @@ const MainAppConfig = (app) => {
         .use((0, morgan_1.default)("dev"))
         .use(express_1.default.json())
         .get("/", (req, res) => {
-        res.status(MainAppError_1.HTTPCODES.OK).json({
-            message: "AD Ready 🚀🚀",
-        });
+        const DATE = new Date().toLocaleDateString();
+        const TIME = new Date().toLocaleTimeString();
+        const dateTime = `${DATE} ${TIME}`;
+        res.status(MainAppError_1.HTTPCODES.OK).send(dateTime);
         // landing route
     })
         .use("/api", route_1.default) //Routes
