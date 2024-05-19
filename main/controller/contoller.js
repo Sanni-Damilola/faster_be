@@ -143,7 +143,7 @@ exports.CreateOrder = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(v
     var _a;
     try {
         const { NAME, ADDRESS, EMAIL, BILL, DESTINATION_NAME, DESTINATION_ADDRESS, DESTINATION_PHONENO, } = req.body;
-        const requiredFields = ["NAME", "ADDRESS", "PHONE"];
+        const requiredFields = ["NAME", "ADDRESS", "DESTINATION_PHONENO"];
         const missingFields = requiredFields.filter((field) => !(field in req.body));
         if (missingFields.length > 0) {
             return res.status(MainAppError_1.HTTPCODES.BAD_REQUEST).json({
