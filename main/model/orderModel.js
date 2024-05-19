@@ -28,73 +28,19 @@ const orderSchema = new mongoose_1.Schema({
     NAME: {
         type: String,
     },
-    ADDRESS: {
-        type: String,
-    },
-    PHONE: {
-        type: String,
-    },
     EMAIL: {
         type: String,
     },
-    ORIGIN: {
+    ADDRESS: {
         type: String,
     },
-    PACKAGE: {
+    BILL: {
         type: String,
     },
-    DESTINATION: {
-        type: String,
-    },
-    CARRIER: {
-        type: String,
-    },
-    TYPEOFSHIPMENT: {
-        type: String,
-    },
-    WEIGHT: {
-        type: String,
-    },
-    SHIPMENTMODE: {
-        type: String,
-    },
-    CARRIERREFERENCENO: {
-        type: String,
-    },
-    PRODUCT: {
-        type: String,
-    },
-    QTY: {
-        type: String,
-    },
-    PAYMENTMODE: {
-        type: String,
-    },
-    TOTALFREIGHT: {
-        type: String,
-    },
-    EXPECTEDDELIVERYDATE: {
-        type: String,
-    },
-    DEPARTURETIME: {
-        type: String,
-    },
-    PICKUPDATE: {
-        type: String,
-    },
-    PICKUPTIME: {
-        type: String,
-    },
-    COMMENTS: {
-        type: String,
-    },
+    DESTINATION_NAME: String,
+    DESTINATION_ADDRESS: String,
+    DESTINATION_PHONENO: String,
     TRACKINGID: String,
-    PIECETYPE: String,
-    DESCRIPTION: String,
-    LENGTH: String,
-    WIDTH: String,
-    HEIGHT_KG: String,
-    WEIGHT_KG: String,
     ShipmentHistory: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,

@@ -8,16 +8,10 @@ const packagesSchema = new mongoose_1.Schema({
     TIME: {
         type: String,
     },
-    LOCATION: {
-        type: String,
-    },
     STATUS: {
         type: String,
     },
     UPDATEDBY: {
-        type: String,
-    },
-    REMARKS: {
         type: String,
     },
 }, { timestamps: true });

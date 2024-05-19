@@ -142,17 +142,8 @@ exports.updateAdmin = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(v
 exports.CreateOrder = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const { NAME, ADDRESS, PHONE, EMAIL, ORIGIN, PACKAGE, DESTINATION, CARRIER, TYPEOFSHIPMENT, WEIGHT, SHIPMENTMODE, CARRIERREFERENCENO, PRODUCT, QTY, PAYMENTMODE, TOTALFREIGHT, EXPECTEDDELIVERYDATE, DEPARTURETIME, PICKUPDATE, PICKUPTIME, COMMENTS, PIECETYPE, DESCRIPTION, LENGTH, WIDTH, WEIGHT_KG, HEIGHT_KG, } = req.body;
-        const requiredFields = [
-            "NAME",
-            "ADDRESS",
-            "PHONE",
-            "EMAIL",
-            "ORIGIN",
-            "PACKAGE",
-            "DESTINATION",
-            "CARRIER",
-        ];
+        const { NAME, ADDRESS, EMAIL, BILL, DESTINATION_NAME, DESTINATION_ADDRESS, DESTINATION_PHONENO, } = req.body;
+        const requiredFields = ["NAME", "ADDRESS", "PHONE"];
         const missingFields = requiredFields.filter((field) => !(field in req.body));
         if (missingFields.length > 0) {
             return res.status(MainAppError_1.HTTPCODES.BAD_REQUEST).json({
@@ -163,32 +154,12 @@ exports.CreateOrder = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(v
         const createdOrder = yield orderModel_1.default.create({
             NAME,
             ADDRESS,
-            PHONE,
             EMAIL,
-            ORIGIN,
-            PACKAGE,
-            DESTINATION,
-            CARRIER,
-            TYPEOFSHIPMENT,
-            WEIGHT,
-            SHIPMENTMODE,
-            CARRIERREFERENCENO,
-            PRODUCT,
-            QTY,
-            PAYMENTMODE,
-            TOTALFREIGHT,
-            EXPECTEDDELIVERYDATE,
-            DEPARTURETIME,
-            PICKUPDATE,
-            PICKUPTIME,
-            COMMENTS,
-            PIECETYPE,
-            DESCRIPTION,
-            LENGTH,
-            WIDTH,
-            WEIGHT_KG,
-            HEIGHT_KG,
             TRACKINGID,
+            BILL,
+            DESTINATION_NAME,
+            DESTINATION_ADDRESS,
+            DESTINATION_PHONENO,
         });
         const DATE = new Date().toLocaleDateString();
         const TIME = new Date().toLocaleTimeString();
@@ -214,7 +185,7 @@ exports.EditOrder = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(voi
     var _b;
     try {
         const { trackingId, id } = req.params;
-        const { NAME, ADDRESS, PHONE, EMAIL, ORIGIN, PACKAGE, DESTINATION, CARRIER, TYPEOFSHIPMENT, WEIGHT, SHIPMENTMODE, CARRIERREFERENCENO, PRODUCT, QTY, PAYMENTMODE, TOTALFREIGHT, EXPECTEDDELIVERYDATE, DEPARTURETIME, PICKUPDATE, PICKUPTIME, COMMENTS, PIECETYPE, DESCRIPTION, LENGTH, WIDTH, WEIGHT_KG, STATUS, HEIGHT_KG, REMARKS, } = req.body;
+        const { NAME, ADDRESS, EMAIL, BILL, DESTINATION_NAME, DESTINATION_ADDRESS, DESTINATION_PHONENO, STATUS, } = req.body;
         const order = yield orderModel_1.default.findOne({ TRACKINGID: trackingId });
         if (!order) {
             return new MainAppError_1.MainAppError({
@@ -225,41 +196,19 @@ exports.EditOrder = (0, AsyncHandler_1.AsyncHandler)((req, res) => __awaiter(voi
         const updatedOrder = yield orderModel_1.default.findByIdAndUpdate(order === null || order === void 0 ? void 0 : order._id, {
             NAME,
             ADDRESS,
-            PHONE,
             EMAIL,
-            ORIGIN,
-            PACKAGE,
-            DESTINATION,
-            CARRIER,
-            TYPEOFSHIPMENT,
-            WEIGHT,
-            SHIPMENTMODE,
-            CARRIERREFERENCENO,
-            PRODUCT,
-            QTY,
-            PAYMENTMODE,
-            TOTALFREIGHT,
-            EXPECTEDDELIVERYDATE,
-            DEPARTURETIME,
-            PICKUPDATE,
-            PICKUPTIME,
-            COMMENTS,
-            PIECETYPE,
-            DESCRIPTION,
-            LENGTH,
-            WIDTH,
-            WEIGHT_KG,
-            HEIGHT_KG,
+            BILL,
+            DESTINATION_NAME,
+            DESTINATION_ADDRESS,
+            DESTINATION_PHONENO,
         }, { new: true });
         const admin = yield adminModel_1.default.findById(id);
         const shipmentHistoryIds = (_b = updatedOrder === null || updatedOrder === void 0 ? void 0 : updatedOrder.ShipmentHistory) === null || _b === void 0 ? void 0 : _b.map((e) => e === null || e === void 0 ? void 0 : e._id);
         const shipment = yield ShipmentHistory_1.default.findOneAndUpdate({ _id: { $in: shipmentHistoryIds } }, {
             DATE: new Date().toLocaleDateString(),
             TIME: new Date().toLocaleTimeString(),
-            LOCATION: ADDRESS,
             STATUS,
             UPDATEDBY: admin === null || admin === void 0 ? void 0 : admin.name,
-            REMARKS,
         }, { new: true });
         yield (shipment === null || shipment === void 0 ? void 0 : shipment.save());
         yield (updatedOrder === null || updatedOrder === void 0 ? void 0 : updatedOrder.save());
